@@ -286,7 +286,7 @@ class ReassignPartitions (val cc: ControllerComponents, val kafkaManagerContext:
         })
       }
 
-      manualReassignmentForm.bindFromRequest.fold(
+      manualReassignmentForm.bindFromRequest().fold(
         errors => kafkaManager.getClusterList.flatMap { errorOrClusterList =>
           responseScreen(
             "Manual Reassign Partitions Failure",
@@ -316,7 +316,7 @@ class ReassignPartitions (val cc: ControllerComponents, val kafkaManagerContext:
           Ok(views.html.errors.onApiError(err, Option(FollowLink("Try Again", routes.Topic.topic(c, t).toString())))).withHeaders("X-Frame-Options" -> "SAMEORIGIN")
         ),
         cc =>
-          generateAssignmentsForm.bindFromRequest.fold(
+          generateAssignmentsForm.bindFromRequest().fold(
             errors => {
               kafkaManager.getGeneratedAssignments(c, t).map { errorOrAssignments =>
                 Ok(views.html.topic.confirmAssignment(c, t, \/-((errors, cc)), errorOrAssignments)).withHeaders("X-Frame-Options" -> "SAMEORIGIN")
@@ -347,7 +347,7 @@ class ReassignPartitions (val cc: ControllerComponents, val kafkaManagerContext:
           Ok(views.html.errors.onApiError(err, Option(FollowLink("Try Again", routes.Topic.topics(c).toString())))).withHeaders("X-Frame-Options" -> "SAMEORIGIN")
         ),
         cc =>
-          generateMultipleAssignmentsForm.bindFromRequest.fold(
+          generateMultipleAssignmentsForm.bindFromRequest().fold(
             errors => Future.successful(Ok(views.html.topic.confirmMultipleAssignments(c, \/-((errors, cc)))).withHeaders("X-Frame-Options" -> "SAMEORIGIN")),
             assignment => {
               kafkaManager.generatePartitionAssignments(c, assignment.topics.filter(_.selected).map(_.name).toSet, assignment.brokers.filter(_.selected).map(_.id).toSet).map { errorOrSuccess =>
@@ -375,7 +375,7 @@ class ReassignPartitions (val cc: ControllerComponents, val kafkaManagerContext:
           Ok(views.html.errors.onApiError(err, Option(FollowLink("Try Again", routes.Topic.topics(c).toString())))).withHeaders("X-Frame-Options" -> "SAMEORIGIN")
         ),
         cc =>
-          reassignMultipleTopicsForm.bindFromRequest.fold(
+          reassignMultipleTopicsForm.bindFromRequest().fold(
             errors => Future.successful(Ok(views.html.topic.runMultipleAssignments(c, \/-((errors, cc)))).withHeaders("X-Frame-Options" -> "SAMEORIGIN")),
             assignment => {
               kafkaManager
@@ -406,7 +406,7 @@ class ReassignPartitions (val cc: ControllerComponents, val kafkaManagerContext:
           Ok(views.html.errors.onApiError(err, Option(FollowLink("Try Force Running", routes.Topic.topic(c, t, force = err.recoverByForceOperation).toString())))).withHeaders("X-Frame-Options" -> "SAMEORIGIN")
         ),
         cc =>
-          reassignPartitionsForm.bindFromRequest.fold(
+          reassignPartitionsForm.bindFromRequest().fold(
             formWithErrors => Future.successful(BadRequest(views.html.topic.topicView(c, t, -\/(ApiError("Unknown operation!")), None, UnknownRPO))),
             op => op match {
               case Some(RunAssignment) =>

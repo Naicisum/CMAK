@@ -30,7 +30,7 @@
                 @b4.vertical.form(routes.Topic.handleDeleteTopic(cluster, topic)) { implicit fc =>
                     <fieldset>
                         @b4.hidden("topic",topic)
-                        @b4.submit('class -> "btn btn-primary btn-block"){ Delete Topic }
+                        @b4.submit(Symbol("class") -> "btn btn-primary btn-block"){ Delete Topic }
                     </fieldset>
                 }
             </div>

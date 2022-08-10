@@ -124,6 +124,10 @@ class Logkafka (val cc: ControllerComponents, val kafkaManagerContext: KafkaMana
     LogkafkaNewConfigs.configMaps(Kafka_3_0_0).map{case(k,v) => LKConfig(k,Some(v))}.toList)
   val kafka_3_1_0_Default = CreateLogkafka("","",
     LogkafkaNewConfigs.configMaps(Kafka_3_1_0).map{case(k,v) => LKConfig(k,Some(v))}.toList)
+  val kafka_3_2_0_Default = CreateLogkafka("", "",
+    LogkafkaNewConfigs.configMaps(Kafka_3_2_0).map{case(k,v) => LKConfig(k, Some(v))}.toList)
+  val kafka_3_2_1_Default = CreateLogkafka("", "",
+    LogkafkaNewConfigs.configMaps(Kafka_3_2_1).map{case(k,v) => LKConfig(k, Some(v))}.toList)
 
   val defaultCreateForm = Form(
     mapping(
@@ -198,6 +202,8 @@ class Logkafka (val cc: ControllerComponents, val kafkaManagerContext: KafkaMana
           case Kafka_2_8_1 => (defaultCreateForm.fill(kafka_2_8_1_Default), clusterContext)
           case Kafka_3_0_0 => (defaultCreateForm.fill(kafka_3_0_0_Default), clusterContext)
           case Kafka_3_1_0 => (defaultCreateForm.fill(kafka_3_1_0_Default), clusterContext)
+          case Kafka_3_2_0 => (defaultCreateForm.fill(kafka_3_2_0_Default), clusterContext)
+          case Kafka_3_2_1 => (defaultCreateForm.fill(kafka_3_2_1_Default), clusterContext)
         }
       }
     }
@@ -230,7 +236,7 @@ class Logkafka (val cc: ControllerComponents, val kafkaManagerContext: KafkaMana
   def handleCreateLogkafka(clusterName: String) = Action.async { implicit request:Request[AnyContent] =>
     clusterFeatureGate(clusterName, KMLogKafkaFeature) { clusterContext =>
       implicit val clusterFeatures = clusterContext.clusterFeatures
-      defaultCreateForm.bindFromRequest.fold(
+      defaultCreateForm.bindFromRequest().fold(
         formWithErrors => {
             Future.successful(BadRequest(views.html.logkafka.createLogkafka(clusterName, \/-((formWithErrors, clusterContext)))))
         },
@@ -255,7 +261,7 @@ class Logkafka (val cc: ControllerComponents, val kafkaManagerContext: KafkaMana
   def handleDeleteLogkafka(clusterName: String, logkafka_id: String, log_path: String) = Action.async { implicit request:Request[AnyContent] =>
     clusterFeatureGate(clusterName, KMLogKafkaFeature) { clusterContext =>
       implicit val clusterFeatures = clusterContext.clusterFeatures
-      defaultDeleteForm.bindFromRequest.fold(
+      defaultDeleteForm.bindFromRequest().fold(
         formWithErrors => Future.successful(
           BadRequest(views.html.logkafka.logkafkaView(
             clusterName,
@@ -316,6 +322,8 @@ class Logkafka (val cc: ControllerComponents, val kafkaManagerContext: KafkaMana
       case Kafka_2_8_1 => LogkafkaNewConfigs.configNames(Kafka_2_8_1).map(n => (n,LKConfig(n,None))).toMap
       case Kafka_3_0_0 => LogkafkaNewConfigs.configNames(Kafka_3_0_0).map(n => (n,LKConfig(n,None))).toMap
       case Kafka_3_1_0 => LogkafkaNewConfigs.configNames(Kafka_3_1_0).map(n => (n,LKConfig(n,None))).toMap
+      case Kafka_3_2_0 => LogkafkaNewConfigs.configNames(Kafka_3_2_0).map(n => (n,LKConfig(n,None))).toMap
+      case Kafka_3_2_1 => LogkafkaNewConfigs.configNames(Kafka_3_2_1).map(n => (n,LKConfig(n,None))).toMap
     }
     val identityOption = li.identityMap.get(log_path)
     if (identityOption.isDefined) {
@@ -346,7 +354,7 @@ class Logkafka (val cc: ControllerComponents, val kafkaManagerContext: KafkaMana
   def handleUpdateConfig(clusterName: String, logkafka_id: String, log_path: String) = Action.async { implicit request:Request[AnyContent] =>
     clusterFeatureGate(clusterName, KMLogKafkaFeature) { clusterContext =>
       implicit val clusterFeatures = clusterContext.clusterFeatures
-      defaultUpdateConfigForm.bindFromRequest.fold(
+      defaultUpdateConfigForm.bindFromRequest().fold(
         formWithErrors => Future.successful(BadRequest(views.html.logkafka.updateConfig(clusterName, logkafka_id, log_path, \/-((formWithErrors, clusterContext))))),
         updateLogkafkaConfig => {
           val props = new Properties()

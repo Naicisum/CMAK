@@ -5,11 +5,11 @@
 name := """cmak"""
 
 /* For packaging purposes, -SNAPSHOT MUST contain a digit */
-version := "3.0.0.6"
+version := "3.0.0.7"
 
-scalaVersion := "2.12.13"
+scalaVersion := "2.13.8"
 
-scalacOptions ++= Seq("-Xlint:-missing-interpolator", "-Xfatal-warnings", "-deprecation", "-feature", "-language:implicitConversions", "-language:postfixOps", "-Xmax-classfile-name", "240")
+scalacOptions ++= Seq("-Xlint:-missing-interpolator", "-deprecation", "-feature", "-language:implicitConversions", "-language:postfixOps")
 
 // From https://www.playframework.com/documentation/2.8.x/Deploying
 assembly / assemblyMergeStrategy := {
@@ -24,10 +24,10 @@ assembly / assemblyMergeStrategy := {
 }
 
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-actor" % "2.5.19",
-  "com.typesafe.akka" %% "akka-slf4j" % "2.5.19",
+  "com.typesafe.akka" %% "akka-actor" % "2.5.23",
+  "com.typesafe.akka" %% "akka-slf4j" % "2.5.23",
   "com.google.code.findbugs" % "jsr305" % "3.0.2",
-  "org.webjars" %% "webjars-play" % "2.6.3",
+  "org.webjars" %% "webjars-play" % "2.7.3",
   "org.webjars" % "bootstrap" % "4.3.1",
   "org.webjars" % "jquery" % "3.5.1",
   "org.webjars" % "backbonejs" % "1.3.3",
@@ -37,20 +37,20 @@ libraryDependencies ++= Seq(
   "org.apache.curator" % "curator-framework" % "2.12.0" exclude("log4j", "log4j") exclude("org.slf4j", "slf4j-log4j12") force(),
   "org.apache.curator" % "curator-recipes" % "2.12.0" exclude("log4j", "log4j") exclude("org.slf4j", "slf4j-log4j12") force(),
   "commons-codec" % "commons-codec" % "1.15",
-  "org.json4s" %% "json4s-jackson" % "3.6.5",
-  "org.json4s" %% "json4s-scalaz" % "3.6.5",
+  "org.json4s" %% "json4s-jackson" % "3.6.6",
+  "org.json4s" %% "json4s-scalaz" % "3.6.6",
   "org.slf4j" % "log4j-over-slf4j" % "1.7.25",
   "com.adrianhurt" %% "play-bootstrap" % "1.6.1-P28-B4" exclude("com.typesafe.play", "*"),
-  "org.clapper" %% "grizzled-slf4j" % "1.3.3",
-  "org.apache.kafka" %% "kafka" % "2.8.0" exclude("log4j", "log4j") exclude("org.slf4j", "slf4j-log4j12") force(),
-  "org.apache.kafka" % "kafka-streams" % "2.8.0",
+  "org.clapper" %% "grizzled-slf4j" % "1.3.4",
+  "org.apache.kafka" %% "kafka" % "3.2.1" exclude("log4j", "log4j") exclude("org.slf4j", "slf4j-log4j12") force(),
+  "org.apache.kafka" % "kafka-streams" % "3.2.1",
   "com.beachape" %% "enumeratum" % "1.5.13",
   "com.github.ben-manes.caffeine" % "caffeine" % "2.6.2",
-  "com.typesafe.play" %% "play-logback" % "2.8.8",
+  "com.typesafe.play" %% "play-logback" % "2.8.9",
   "org.scalatest" %% "scalatest" % "3.1.4" % "test",
   "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % "test",
   "org.apache.curator" % "curator-test" % "2.12.0" % "test",
-  "org.scalatestplus" % "mockito-3-4_2.12" % "3.2.8.0" % "test",
+  "org.scalatestplus" % "mockito-3-4_2.13" % "3.2.8.0" % "test",
   "com.yammer.metrics" % "metrics-core" % "2.2.0" force(),
   "com.unboundid" % "unboundid-ldapsdk" % "4.0.9"
 )

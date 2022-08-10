@@ -122,8 +122,8 @@ object LogConfig extends TopicConfigs {
   /**
    * Check that property names are valid
    */
-  def validateNames(props: Properties) {
-    import scala.collection.JavaConverters._
+  def validateNames(props: Properties): Unit = {
+    import scala.jdk.CollectionConverters._
     for (name <- props.keys.asScala)
       require(LogConfig.ConfigNames.asJava.contains(name), "Unknown configuration \"%s\".".format(name))
   }
@@ -131,7 +131,7 @@ object LogConfig extends TopicConfigs {
   /**
    * Check that the given properties contain only valid log config names, and that all values can be parsed.
    */
-  def validate(props: Properties) {
+  def validate(props: Properties): Unit = {
     validateNames(props)
     LogConfig.fromProps(LogConfig().toProps, props) // check that we can parse the values
   }

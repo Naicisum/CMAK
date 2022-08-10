@@ -154,7 +154,7 @@ class KafkaStateCheck (val cc: ControllerComponents, val kafkaManagerContext: Ka
                 Map("name" -> consumer,
                   "type" -> consumerType.toString,
                   "topics" -> consumerIdentity.map(_.topicMap.keys),
-                  "lags" -> consumerIdentity.map(_.topicMap.mapValues(_.totalLag))
+                  "lags" -> consumerIdentity.map(_.topicMap.view.mapValues(_.totalLag).toMap)
                 )
             })).withHeaders("X-Frame-Options" -> "SAMEORIGIN")
         )

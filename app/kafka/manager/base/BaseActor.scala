@@ -19,7 +19,7 @@ abstract class BaseActor extends Actor with ActorLogging {
     case any: Any if shutdown =>
       val msg = s"Actor already shutdown, ignoring message $any"
       log.error(msg)
-      sender ! ActorErrorResponse(msg)
+      sender() ! ActorErrorResponse(msg)
     case request: ActorRequest =>
       processActorRequest(request)
     case response: ActorResponse=>

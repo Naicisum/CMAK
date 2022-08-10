@@ -153,7 +153,7 @@ case class HighLevelConsumer(topic: String,
     })
   }
 
-  def close() {
+  def close(): Unit = {
     kafkaStreams.close()
   }
 }
@@ -234,7 +234,7 @@ case class NewKafkaManagedConsumer(topic: String,
   info("setup:complete topic=%s for zk=%s and groupId=%s".format(topic,brokerConnect,groupId))
 
   def read(write: (String)=>Unit) = {
-    import collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     while (true) {
       val records : ConsumerRecords[String, String] = consumer.poll(Duration.ofMillis(pollMillis))
       for(record <- records.asScala) {
@@ -243,7 +243,7 @@ case class NewKafkaManagedConsumer(topic: String,
     }
   }
 
-  def close() {
+  def close(): Unit = {
     consumer.close()
   }
 }

@@ -39,7 +39,7 @@ class KafkaCommandActor(kafkaCommandActorConfig: KafkaCommandActorConfig) extend
   }
 
   @scala.throws[Exception](classOf[Exception])
-  override def preRestart(reason: Throwable, message: Option[Any]) {
+  override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
     log.error(reason, "Restarting due to [{}] when processing [{}]",
       reason.getMessage, message.getOrElse(""))
     super.preRestart(reason, message)
@@ -53,7 +53,7 @@ class KafkaCommandActor(kafkaCommandActorConfig: KafkaCommandActorConfig) extend
   override protected def longRunningPoolConfig: LongRunningPoolConfig = kafkaCommandActorConfig.longRunningPoolConfig
 
   override protected def longRunningQueueFull(): Unit = {
-    sender ! KCCommandResult(Try(throw new UnsupportedOperationException("Long running executor blocking queue is full!")))
+    sender() ! KCCommandResult(Try(throw new UnsupportedOperationException("Long running executor blocking queue is full!")))
   }
 
   override def processActorResponse(response: ActorResponse): Unit = {
@@ -70,7 +70,7 @@ class KafkaCommandActor(kafkaCommandActorConfig: KafkaCommandActorConfig) extend
         {
           val result : KCCommandResult = KCCommandResult(Failure(new UnsupportedOperationException(
             s"Delete topic not supported for kafka version ${kafkaCommandActorConfig.clusterContext.config.version}")))
-          sender ! result
+          sender() ! result
         },
         {
           longRunning {

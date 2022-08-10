@@ -17,7 +17,7 @@ import javax.management.remote.rmi.RMIConnectorServer
 import javax.management.remote.{JMXConnector, JMXConnectorFactory, JMXServiceURL}
 import javax.naming.Context
 import javax.rmi.ssl.SslRMIClientSocketFactory
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.matching.Regex
 import scala.util.{Failure, Try}
 
@@ -157,7 +157,7 @@ object KafkaMetrics {
   )
 
   private def getOSMetric(mbsc: MBeanServerConnection) = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     try {
       val attributes = mbsc.getAttributes(
         operatingSystemObjectName,
@@ -173,7 +173,7 @@ object KafkaMetrics {
   }
   
   private def getMeterMetric(mbsc: MBeanServerConnection, name: ObjectName) = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     try {
       val attributeList = mbsc.getAttributes(name, Array("Count", "FifteenMinuteRate", "FiveMinuteRate", "OneMinuteRate", "MeanRate"))
       val attributes = attributeList.asList().asScala.toSeq
@@ -219,9 +219,9 @@ object KafkaMetrics {
     valueConverter: Object => V
     ) = {
     val logsSizeObjectNames = mbsc.queryNames(objectName, null).asScala.toSeq
-    logsSizeObjectNames.par.map {
+    (logsSizeObjectNames).map {
       objectName => queryValue(mbsc, objectName, keyConverter, valueConverter)
-    }.seq.toSeq
+    }
   }
 
   private def queryValue[K, V](
@@ -288,7 +288,7 @@ object KafkaMetrics {
         (topic, (partition, LogInfo(dir, logSegments)))
       }
 
-    stats.groupBy(_._1).mapValues(_.map(_._2).toMap).toMap
+    stats.groupBy(_._1).view.mapValues(_.map(_._2).toMap).toMap
   }
 
   // return broker metrics with segment metric only when it's provided. if not, it will contain segment metric with value 0L
@@ -390,10 +390,10 @@ object FormatMetric {
         //this determines the class, i.e. 'k', 'm' etc
         if (value > 99.9 || isRound || (!isRound && value > 9.99)) {
           //this decides whether to trim the decimals
-          value.toInt * 10 / 10 + "" + UNIT(iteration) // (int) value * 10 / 10 drops the decimal
+          (value.toInt * 10 / 10).toString + "" + UNIT(iteration).toString // (int) value * 10 / 10 drops the decimal
         }
         else {
-          value + "" + UNIT(iteration)
+          value.toString + "" + UNIT(iteration).toString
         }
       }
       else {
@@ -406,10 +406,10 @@ object FormatMetric {
   def sizeFormat(bytes: Long): String = {
     val unit = 1000
     if (bytes < unit) {
-      bytes + " B"
+      bytes.toString + " B"
     } else {
-      val exp = (math.log(bytes) / math.log(unit)).toInt
-      val pre = "kMGTPE".charAt(exp-1)
+      val exp = (math.log(bytes.toDouble) / math.log(unit.toDouble))
+      val pre = "kMGTPE".charAt((exp-1).toInt)
       "%.1f %sB".format(bytes / math.pow(unit, exp), pre)
     }
   }

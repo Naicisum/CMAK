@@ -46,7 +46,7 @@ trait LongRunningPoolActor extends BaseActor {
         case _ if ct.runtimeClass == classOf[Unit] =>
         //do nothing with unit
         case f =>
-          f pipeTo sender
+          f pipeTo sender()
       }
     }
   }

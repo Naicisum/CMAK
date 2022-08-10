@@ -29,7 +29,7 @@ import org.apache.kafka.common.record.{LegacyRecord, TimestampType}
 import org.apache.kafka.common.utils.Utils
 
 import java.util.{Collections, Locale, Properties}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.{Map, mutable}
 
 object Defaults {
@@ -57,7 +57,7 @@ object Defaults {
   val MinInSyncReplicas = kafka.server.Defaults.MinInSyncReplicas
   val CompressionType = kafka.server.Defaults.CompressionType
   val PreAllocateEnable = kafka.server.Defaults.LogPreAllocateEnable
-  val MessageFormatVersion = kafka.server.Defaults.LogMessageFormatVersion
+  val MessageFormatVersion = kafka.api.KAFKA_3_0_IV1.version
   val MessageTimestampType = kafka.server.Defaults.LogMessageTimestampType
   val MessageTimestampDifferenceMaxMs = kafka.server.Defaults.LogMessageTimestampDifferenceMaxMs
   val LeaderReplicationThrottledReplicas = Collections.emptyList[String]()
@@ -103,7 +103,7 @@ case class LogConfig(props: java.util.Map[_, _], overriddenConfigs: Set[String] 
 
 object LogConfig extends TopicConfigs {
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     println(configDef.toHtmlTable)
   }
 
@@ -253,7 +253,7 @@ object LogConfig extends TopicConfigs {
       .define(PreAllocateEnableProp, BOOLEAN, Defaults.PreAllocateEnable, MEDIUM, PreAllocateEnableDoc,
         KafkaConfig.LogPreAllocateProp)
       .define(MessageFormatVersionProp, STRING, Defaults.MessageFormatVersion, MEDIUM, MessageFormatVersionDoc,
-        KafkaConfig.LogMessageFormatVersionProp)
+        "log.message.format.version")
       .define(MessageTimestampTypeProp, STRING, Defaults.MessageTimestampType, MEDIUM, MessageTimestampTypeDoc,
         KafkaConfig.LogMessageTimestampTypeProp)
       .define(MessageTimestampDifferenceMaxMsProp, LONG, Defaults.MessageTimestampDifferenceMaxMs,
@@ -284,7 +284,7 @@ object LogConfig extends TopicConfigs {
   /**
     * Check that property names are valid
     */
-  def validateNames(props: Properties) {
+  def validateNames(props: Properties): Unit = {
     val names = configNames
     for(name <- props.asScala.keys)
       if (!names.contains(name))
@@ -294,7 +294,7 @@ object LogConfig extends TopicConfigs {
   /**
     * Check that the given properties contain only valid log config names and that all values can be parsed and are valid
     */
-  def validate(props: Properties) {
+  def validate(props: Properties): Unit = {
     validateNames(props)
     configDef.parse(props)
   }
@@ -323,7 +323,7 @@ object LogConfig extends TopicConfigs {
     MinInSyncReplicasProp -> KafkaConfig.MinInSyncReplicasProp,
     CompressionTypeProp -> KafkaConfig.CompressionTypeProp,
     PreAllocateEnableProp -> KafkaConfig.LogPreAllocateProp,
-    MessageFormatVersionProp -> KafkaConfig.LogMessageFormatVersionProp,
+    MessageFormatVersionProp -> "log.message.format.version",
     MessageTimestampTypeProp -> KafkaConfig.LogMessageTimestampTypeProp,
     MessageTimestampDifferenceMaxMsProp -> KafkaConfig.LogMessageTimestampDifferenceMaxMsProp
   )

@@ -220,14 +220,14 @@
                                     <fieldset>
                                         <input type="hidden" name="operation" value="force">
                                         <input type="hidden" name="brokers" value="@Seq()">
-                                        @b4.submit('class -> "btn btn-primary btn-block"){ Force Reassign Partitions }
+                                        @b4.submit(Symbol("class") -> "btn btn-primary btn-block"){ Force Reassign Partitions }
                                     </fieldset>
                                 }
                                 case _ => {
                                     <fieldset>
                                         <input type="hidden" name="operation" value="run">
                                         <input type="hidden" name="brokers" value="@Seq()">
-                                        @b4.submit('class -> "btn btn-primary btn-block"){ Reassign Partitions }
+                                        @b4.submit(Symbol("class") -> "btn btn-primary btn-block"){ Reassign Partitions }
                                     </fieldset>
                                 }
                             }

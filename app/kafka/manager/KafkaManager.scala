@@ -114,7 +114,7 @@ class KafkaManager(akkaConfig: Config) extends Logging {
       KafkaManagedOffsetGroupCacheSize -> KafkaManagedOffsetCacheConfig.defaultGroupTopicPartitionOffsetMaxSize.toString,
       KafkaManagedOffsetGroupExpireDays -> KafkaManagedOffsetCacheConfig.defaultGroupTopicPartitionOffsetExpireDays.toString
     )
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     ConfigFactory.parseMap(defaults.asJava)
   }
 
@@ -514,7 +514,7 @@ class KafkaManager(akkaConfig: Config) extends Logging {
     getTopicIdentity(clusterName, topic).flatMap { topicIdentityOrError =>
       topicIdentityOrError.fold(
       e => Future.successful(-\/(e)), { ti =>
-        val partitionReplicaList: Map[Int, Seq[Int]] = ti.partitionsIdentity.mapValues(_.replicas)
+        val partitionReplicaList: Map[Int, Seq[Int]] = ti.partitionsIdentity.view.mapValues(_.replicas).toMap
         withKafkaManagerActor(
           KMClusterCommandRequest(
             clusterName,
@@ -542,7 +542,7 @@ class KafkaManager(akkaConfig: Config) extends Logging {
       tleOrError.fold(
       e => Future.successful(-\/(e)), { tle =>
         // add partitions to only topics with topic identity
-        val topicsAndReplicas = topicListSortedByNumPartitions(tle).filter(t => topics.contains(t._1) && t._2.nonEmpty).map{ case (t,i) => (t, i.get.partitionsIdentity.mapValues(_.replicas)) }
+        val topicsAndReplicas = topicListSortedByNumPartitions(tle).filter(t => topics.contains(t._1) && t._2.nonEmpty).map{ case (t,i) => (t, i.get.partitionsIdentity.view.mapValues(_.replicas).toMap) }
         withKafkaManagerActor(
           KMClusterCommandRequest(
             clusterName,

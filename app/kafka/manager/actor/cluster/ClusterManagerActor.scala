@@ -219,7 +219,7 @@ class ClusterManagerActor(cmConfig: ClusterManagerActorConfig)
   }
 
   @scala.throws[Exception](classOf[Exception])
-  override def preRestart(reason: Throwable, message: Option[Any]) {
+  override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
     log.error(reason, "Restarting due to [{}] when processing [{}]",
       reason.getMessage, message.getOrElse(""))
     super.preRestart(reason, message)
@@ -263,7 +263,7 @@ class ClusterManagerActor(cmConfig: ClusterManagerActorConfig)
         }
 
       case CMGetClusterContext =>
-        sender ! clusterContext
+        sender() ! clusterContext
         
       case CMGetView =>
         implicit val ec = context.dispatcher
@@ -273,7 +273,7 @@ class ClusterManagerActor(cmConfig: ClusterManagerActorConfig)
           bl <- eventualBrokerList
           tl <- eventualTopicList
         } yield CMView(tl.list.size, bl.list.size, clusterContext)
-        result pipeTo sender
+        result pipeTo sender()
 
       case CMGetTopicIdentity(topic) =>
         implicit val ec = context.dispatcher
@@ -292,7 +292,7 @@ class ClusterManagerActor(cmConfig: ClusterManagerActorConfig)
           tdO <- eventualTopicDescription
           tp <- eventualTopicPartitionSizes
         } yield tdO.map( td => CMTopicIdentity(Try(TopicIdentity.from(bl,td,tm,tp,clusterContext,None))))
-        result pipeTo sender
+        result pipeTo sender()
 
       case CMGetLogkafkaIdentity(logkafka_id) =>
         implicit val ec = context.dispatcher
@@ -302,7 +302,7 @@ class ClusterManagerActor(cmConfig: ClusterManagerActorConfig)
           lcg <- eventualLogkafkaConfig
           lct <- eventualLogkafkaClient
         } yield Some(CMLogkafkaIdentity(Try(LogkafkaIdentity.from(logkafka_id,lcg,lct))))
-        result pipeTo sender
+        result pipeTo sender()
 
       case CMGetConsumerIdentity(consumer, consumerType) =>
         implicit val ec = context.dispatcher
@@ -311,7 +311,7 @@ class ClusterManagerActor(cmConfig: ClusterManagerActorConfig)
           cd <- eventualConsumerDescription
           ciO = CMConsumerIdentity(Try(ConsumerIdentity.from(cd,clusterContext)))
         } yield ciO
-        result pipeTo sender
+        result pipeTo sender()
 
       case CMGetConsumedTopicState(consumer, topic, consumerType) =>
         implicit val ec = context.dispatcher
@@ -321,7 +321,7 @@ class ClusterManagerActor(cmConfig: ClusterManagerActorConfig)
         val result: Future[CMConsumedTopic] = eventualConsumedTopicDescription.map{
           ctd: ConsumedTopicDescription =>  CMConsumedTopic(Try(ConsumedTopicState.from(ctd, clusterContext)))
         }
-        result pipeTo sender
+        result pipeTo sender()
 
       case CMGetGeneratedPartitionAssignments(topic) =>
         implicit val ec = context.dispatcher
@@ -331,7 +331,7 @@ class ClusterManagerActor(cmConfig: ClusterManagerActorConfig)
           assignments = getGeneratedPartitionAssignments(topic)
           nonExistentBrokers = getNonExistentBrokers(bl, assignments)
         } yield GeneratedPartitionAssignments(topic, assignments, nonExistentBrokers)
-        topicIdentityAndNonExistingBrokers pipeTo sender
+        topicIdentityAndNonExistingBrokers pipeTo sender()
 
       case any: Any => log.warning("cma : processQueryResponse : Received unknown message: {}", any)
     }

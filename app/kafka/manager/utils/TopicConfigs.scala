@@ -13,7 +13,7 @@ import java.util.Properties
 trait TopicConfigs {
   def configNames: Seq[String]
 
-  def validate(props: Properties)
+  def validate(props: Properties): Unit
 
   def configNamesAndDoc: Seq[(String, String)]
 }
@@ -56,7 +56,9 @@ object TopicConfigs {
     Kafka_2_8_0 -> two40.LogConfig,
     Kafka_2_8_1 -> two40.LogConfig,
     Kafka_3_0_0 -> two40.LogConfig,
-    Kafka_3_1_0 -> two40.LogConfig
+    Kafka_3_1_0 -> two40.LogConfig,
+    Kafka_3_2_0 -> two40.LogConfig,
+    Kafka_3_2_1 -> two40.LogConfig
   )
 
   def configNames(version: KafkaVersion): Seq[String] = {

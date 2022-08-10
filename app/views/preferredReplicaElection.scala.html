@@ -75,7 +75,7 @@ operationForm: Form[models.form.PreferredReplicaElectionOperation]
                     @b4.vertical.form(routes.PreferredReplicaElection.handleRunElection(cluster)) { implicit fc =>
                     <fieldset>
                         <input type="hidden" name="operation" value="run">
-                        @b4.submit('class -> "btn btn-primary"){ Run Preferred Replica Election }
+                        @b4.submit(Symbol("class") -> "btn btn-primary"){ Run Preferred Replica Election }
                     </fieldset>
                     }
                 </div>

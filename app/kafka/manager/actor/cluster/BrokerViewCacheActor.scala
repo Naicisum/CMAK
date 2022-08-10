@@ -140,31 +140,31 @@ class BrokerViewCacheActor(config: BrokerViewCacheActorConfig) extends LongRunni
         }
 
       case BVGetViews =>
-        sender ! allBrokerViews()
+        sender() ! allBrokerViews()
 
 
       case BVGetView(id) =>
-        sender ! brokerTopicPartitions.get(id).map { bv =>
+        sender() ! brokerTopicPartitions.get(id).map { bv =>
           produceBViewWithBrokerClusterState(bv, id)
         }
 
       case BVGetBrokerMetrics =>
-        sender ! brokerMetrics
+        sender() ! brokerMetrics
 
       case BVGetTopicMetrics(topic) =>
-        sender ! topicMetrics.get(topic).map(m => m.values.foldLeft(BrokerMetrics.DEFAULT)((acc,bm) => acc + bm))
+        sender() ! topicMetrics.get(topic).map(m => m.values.foldLeft(BrokerMetrics.DEFAULT)((acc,bm) => acc + bm))
 
       case BVGetTopicIdentities =>
-        sender ! topicIdentities
+        sender() ! topicIdentities
 
       case BVGetTopicConsumerMap =>
-        sender ! topicConsumerMap
+        sender() ! topicConsumerMap
 
       case BVGetConsumerIdentities =>
-        sender ! consumerIdentities
+        sender() ! consumerIdentities
 
       case BVGetBrokerTopicPartitionSizes(topic) =>
-        sender ! brokerTopicPartitionSizes.get(topic).map(m => m.map{case (k,v) => (k, v.toMap)}.toMap)
+        sender() ! brokerTopicPartitionSizes.get(topic).map(m => m.map{case (k,v) => (k, v.toMap)}.toMap)
 
       case BVUpdateTopicMetricsForBroker(id, metrics) =>
         metrics.foreach {

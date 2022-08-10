@@ -37,7 +37,7 @@ object Logkafka extends Logging {
   private val rgx = new Regex(legalChars + "+")
   private val illRgxPath = new Regex(illegalPathChars)
 
-  def validateHostname(hostname: String) {
+  def validateHostname(hostname: String): Unit = {
     checkCondition(hostname.length > 0, HostnameEmpty)
     checkCondition(hostname.length <= maxNameLength, InvalidHostnameLength)
     rgx.findFirstIn(hostname) match {
@@ -50,7 +50,7 @@ object Logkafka extends Logging {
     checkCondition(hostname.matches(validHostnameRegex), InvalidHostname)
   }
 
-  def validateLogkafkaId(logkafka_id: String) {
+  def validateLogkafkaId(logkafka_id: String): Unit = {
     checkCondition(logkafka_id.length > 0, LogkafkaIdEmpty)
     checkCondition(!(logkafka_id.equals(".") || logkafka_id.equals("..")), InvalidLogkafkaId)
     checkCondition(logkafka_id.length <= maxNameLength, InvalidLogkafkaIdLength)
@@ -62,7 +62,7 @@ object Logkafka extends Logging {
     }
   }
 
-  def validatePath(log_path: String) {
+  def validatePath(log_path: String): Unit = {
     checkCondition(log_path.length > 0, LogPathEmpty)
     checkCondition(log_path.startsWith("/"), LogPathNotAbsolute)
     checkCondition(log_path.length <= maxPathLength, InvalidLogPathLength)

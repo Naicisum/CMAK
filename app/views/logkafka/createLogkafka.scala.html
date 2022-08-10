@@ -20,15 +20,15 @@
         <tbody>
         <tr>
             <td>
-                @b4.text(createLogkafkaForm("logkafka_id"), '_label -> "Logkafka Id", 'placeholder -> "test.logkafka.net", 'autofocus -> true )
-                @b4.text(createLogkafkaForm("log_path"), '_label -> "Log Path", 'placeholder -> "/usr/local/apache2/logs/access_log.%Y%m%d")
-                @b4.submit('class -> "submit-button btn btn-primary"){ Create }
+                @b4.text(createLogkafkaForm("logkafka_id"), Symbol("_label") -> "Logkafka Id", Symbol("placeholder") -> "test.logkafka.net", Symbol("autofocus") -> true )
+                @b4.text(createLogkafkaForm("log_path"), Symbol("_label") -> "Log Path", Symbol("placeholder") -> "/usr/local/apache2/logs/access_log.%Y%m%d")
+                @b4.submit(Symbol("class") -> "submit-button btn btn-primary"){ Create }
                 <a href="@routes.Logkafka.logkafkas(cluster)" class="cancel-button btn btn-secondary" role="button">Cancel</a>
             </td>
             <td>
                 @helper.repeat(createLogkafkaForm("configs"), min = 1) { configsForm =>
                     @b4.hidden(configsForm("name").name, configsForm("name").value.getOrElse(""))
-                    @b4.text(configsForm("value"), '_label -> configsForm("name").value.getOrElse(""))
+                    @b4.text(configsForm("value"), Symbol("_label") -> configsForm("name").value.getOrElse(""))
                 }
             </td>
         </tr>

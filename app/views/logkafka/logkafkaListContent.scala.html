@@ -90,16 +90,16 @@
                                     <a href="@routes.Logkafka.updateConfig(cluster, logkafka_id, log_path)" class="btn btn-outline-primary ops-button" role="button">Modify</a>
                                     @b4.vertical.form(routes.Logkafka.handleDisableConfig(cluster, logkafka_id, log_path)) { implicit fc =>
                                         <input type="hidden" name="name" value="@cluster">
-                                        @b4.submit('class -> "btn btn-outline-warning ops-button"){ Disable }
+                                        @b4.submit(Symbol("class") -> "btn btn-outline-warning ops-button"){ Disable }
                                     }
                                 } else {
                                     @b4.vertical.form(routes.Logkafka.handleEnableConfig(cluster, logkafka_id, log_path)) { implicit fc =>
                                         <input type="hidden" name="name" value="@cluster">
-                                        @b4.submit('class -> "btn btn-outline-success ops-button"){ Enable }
+                                        @b4.submit(Symbol("class") -> "btn btn-outline-success ops-button"){ Enable }
                                     }
                                     @b4.vertical.form(routes.Logkafka.handleDeleteLogkafka(cluster, logkafka_id, log_path)) { implicit fc =>
                                         <input type="hidden" name="name" value="@cluster">
-                                        @b4.submit('class -> "btn btn-outline-danger ops-button"){ Delete }
+                                        @b4.submit(Symbol("class") -> "btn btn-outline-danger ops-button"){ Delete }
                                     }
                                 }
                             }.getOrElse{<td> </td>}

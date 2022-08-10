@@ -25,13 +25,13 @@
                         @b4.vertical.form(routes.PreferredReplicaElection.handleScheduleRunElection(cluster)) { implicit fc =>
                             <input type="number" min="1" name="timePeriod" class="form-control col-md-8" placeholder="Time for scheduling (in min)" required />
                             <fieldset>
-                            @b4.submit('class -> "btn btn-primary"){ Schedule Preferred Replica Election }
+                            @b4.submit(Symbol("class") -> "btn btn-primary"){ Schedule Preferred Replica Election }
                             </fieldset>
                         }
                     } else {
                         @b4.vertical.form(routes.PreferredReplicaElection.cancelScheduleRunElection(cluster)) { implicit fc =>
                             <fieldset>
-                            @b4.submit('class -> "btn btn-primary"){ Cancel Preferred Replica Election }
+                            @b4.submit(Symbol("class") -> "btn btn-primary"){ Cancel Preferred Replica Election }
                             </fieldset>
                         }
                     }

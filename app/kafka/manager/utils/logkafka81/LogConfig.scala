@@ -180,8 +180,8 @@ object LogConfig extends LogkafkaNewConfigs {
   /**
    * Check that property names are valid
    */
-  def validateNames(props: Properties) {
-    import scala.collection.JavaConverters._
+  def validateNames(props: Properties): Unit = {
+    import scala.jdk.CollectionConverters._
     for(name <- props.keys().asScala)
       require(LogConfig.ConfigNames.asJava.contains(name), "Unknown configuration \"%s\".".format(name))
   }
@@ -189,7 +189,7 @@ object LogConfig extends LogkafkaNewConfigs {
   /**
    * Check that the given properties contain only valid log config names, and that all values can be parsed.
    */
-  def validate(props: Properties) {
+  def validate(props: Properties): Unit = {
     validateNames(props)
     validateLineDelimiter(props)
     validateTopic(props)
@@ -200,7 +200,7 @@ object LogConfig extends LogkafkaNewConfigs {
   /**
    * Check that LineDelimiter is reasonable
    */
-  private def validateLineDelimiter(props: Properties) {
+  private def validateLineDelimiter(props: Properties): Unit = {
     val lineDelimiter = props.getProperty(LineDelimiterProp)
     if (lineDelimiter == null) return
     checkCondition(lineDelimiter.toInt >= minLineDelimiter && lineDelimiter.toInt <= maxLineDelimiter, LogkafkaConfigErrors.InvalidLineDelimiter)
@@ -209,7 +209,7 @@ object LogConfig extends LogkafkaNewConfigs {
   /**
    * Check that Topic is reasonable
    */
-  private def validateTopic(props: Properties) {
+  private def validateTopic(props: Properties): Unit = {
     val topic = props.getProperty(TopicProp)
     require(topic != null , "Topic is null")
   }
@@ -217,7 +217,7 @@ object LogConfig extends LogkafkaNewConfigs {
   /**
    * Check that is RegexFilterPattern reasonable
    */
-  private def validateRegexFilterPattern(props: Properties) {
+  private def validateRegexFilterPattern(props: Properties): Unit = {
     val regexFilterPattern = props.getProperty(RegexFilterPatternProp)
     if (regexFilterPattern == null) return
     checkCondition(regexFilterPattern.length <= maxRegexFilterPatternLength, LogkafkaConfigErrors.InvalidRegexFilterPatternLength)

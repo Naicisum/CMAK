@@ -16,7 +16,7 @@ addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.4")
 resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/"
 
 // Use the Play sbt plugin for Play projects
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.8")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.9")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-jshint" % "1.0.6")
 

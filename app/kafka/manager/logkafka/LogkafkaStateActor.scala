@@ -20,7 +20,7 @@ import scala.util.{Failure, Success, Try}
 /**
  * @author hiral
  */
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 class LogkafkaStateActor(curator: CuratorFramework, 
                       clusterContext: ClusterContext) extends BaseQueryCommandActor {
 
@@ -75,7 +75,7 @@ class LogkafkaStateActor(curator: CuratorFramework,
   }
 
   @scala.throws[Exception](classOf[Exception])
-  override def preRestart(reason: Throwable, message: Option[Any]) {
+  override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
     log.error(reason, "Restarting due to [{}] when processing [{}]",
       reason.getMessage, message.getOrElse(""))
     super.preRestart(reason, message)
@@ -134,22 +134,22 @@ class LogkafkaStateActor(curator: CuratorFramework,
         withLogkafkaConfigTreeCache { cache =>
           cache.getCurrentChildren(LogkafkaZkUtils.LogkafkaConfigPath)
         }.fold {
-          sender ! LogkafkaLogkafkaIdList(IndexedSeq.empty, deleteSet)
+          sender() ! LogkafkaLogkafkaIdList(IndexedSeq.empty, deleteSet)
         } { data: java.util.Map[String, ChildData] =>
-          sender ! LogkafkaLogkafkaIdList(data.asScala.map(kv => kv._1).toIndexedSeq, deleteSet)
+          sender() ! LogkafkaLogkafkaIdList(data.asScala.map(kv => kv._1).toIndexedSeq, deleteSet)
         }
 
       case LKSGetLogkafkaConfig(logkafka_id) =>
-        sender ! getLogkafkaConfig(logkafka_id)
+        sender() ! getLogkafkaConfig(logkafka_id)
 
       case LKSGetLogkafkaClient(logkafka_id) =>
-        sender ! getLogkafkaClient(logkafka_id)
+        sender() ! getLogkafkaClient(logkafka_id)
 
       case LKSGetLogkafkaConfigs(logkafka_ids) =>
-        sender ! LogkafkaConfigs(logkafka_ids.toIndexedSeq.map(getLogkafkaConfig).flatten, logkafkaConfigTreeCacheLastUpdateMillis)
+        sender() ! LogkafkaConfigs(logkafka_ids.toIndexedSeq.map(getLogkafkaConfig).flatten, logkafkaConfigTreeCacheLastUpdateMillis)
 
       case LKSGetLogkafkaClients(logkafka_ids) =>
-        sender ! LogkafkaClients(logkafka_ids.toIndexedSeq.map(getLogkafkaClient).flatten, logkafkaClientTreeCacheLastUpdateMillis)
+        sender() ! LogkafkaClients(logkafka_ids.toIndexedSeq.map(getLogkafkaClient).flatten, logkafkaClientTreeCacheLastUpdateMillis)
 
       case LKSGetAllLogkafkaConfigs(lastUpdateMillisOption) =>
         val lastUpdateMillis = lastUpdateMillisOption.getOrElse(0L)
@@ -158,9 +158,9 @@ class LogkafkaStateActor(curator: CuratorFramework,
           withLogkafkaConfigTreeCache {  cache: TreeCache =>
             cache.getCurrentChildren(LogkafkaZkUtils.LogkafkaConfigPath)
           }.fold {
-            sender ! LogkafkaConfigs(IndexedSeq.empty, logkafkaConfigTreeCacheLastUpdateMillis)
+            sender() ! LogkafkaConfigs(IndexedSeq.empty, logkafkaConfigTreeCacheLastUpdateMillis)
           } { data: java.util.Map[String, ChildData] =>
-            sender ! LogkafkaConfigs(data.asScala.keys.toIndexedSeq.map(getLogkafkaConfig).flatten, logkafkaConfigTreeCacheLastUpdateMillis)
+            sender() ! LogkafkaConfigs(data.asScala.keys.toIndexedSeq.map(getLogkafkaConfig).flatten, logkafkaConfigTreeCacheLastUpdateMillis)
           }
         } // else no updates to send
 
@@ -171,9 +171,9 @@ class LogkafkaStateActor(curator: CuratorFramework,
           withLogkafkaClientTreeCache {  cache: TreeCache =>
             cache.getCurrentChildren(LogkafkaZkUtils.LogkafkaClientPath)
           }.fold {
-            sender ! LogkafkaClients(IndexedSeq.empty, logkafkaClientTreeCacheLastUpdateMillis)
+            sender() ! LogkafkaClients(IndexedSeq.empty, logkafkaClientTreeCacheLastUpdateMillis)
           } { data: java.util.Map[String, ChildData] =>
-            sender ! LogkafkaClients(data.asScala.keys.toIndexedSeq.map(getLogkafkaClient).flatten, logkafkaClientTreeCacheLastUpdateMillis)
+            sender() ! LogkafkaClients(data.asScala.keys.toIndexedSeq.map(getLogkafkaClient).flatten, logkafkaClientTreeCacheLastUpdateMillis)
           }
         } // else no updates to send
 

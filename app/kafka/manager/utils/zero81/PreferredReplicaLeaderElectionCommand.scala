@@ -48,7 +48,7 @@ object PreferredReplicaLeaderElectionCommand extends Logging {
 
 
   def writePreferredReplicaElectionData(curator: CuratorFramework,
-                                        partitionsUndergoingPreferredReplicaElection: Set[TopicPartition]) {
+                                        partitionsUndergoingPreferredReplicaElection: Set[TopicPartition]): Unit = {
     checkCondition(partitionsUndergoingPreferredReplicaElection.nonEmpty,PreferredLeaderElectionErrors.ElectionSetEmptyOnWrite)
     val zkPath = ZkUtils.PreferredReplicaLeaderElectionPath
     val partitionsList : Set[Map[String,Any]] =

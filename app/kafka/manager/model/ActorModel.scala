@@ -407,7 +407,7 @@ object ActorModel {
           .toList
           .flatMap(t => t._2.isr.map(i => (i,t._2.partNum, i == t._2.leader)))
           .groupBy(_._1)
-          .mapValues(l => l.map(t => (t._2, t._3)))
+          .view.mapValues(l => l.map(t => (t._2, t._3))).toMap
 
       val brokersForTopic = brokerPartitionsMap.keySet.size
       val avgPartitionsPerBroker : Double = Math.ceil((1.0 * partitions) / brokersForTopic * replicationFactor)
@@ -603,7 +603,7 @@ object ActorModel {
       // only defined if every partition has a latest offset
       if (partitionLatestOffsets.values.size == numPartitions && partitionLatestOffsets.size == numPartitions) {
           val activePartitionsOffsets = partitionOffsets.filter(ptLtOffset => ptLtOffset._2 != -1)
-          Some(partitionLatestOffsets.filterKeys(activePartitionsOffsets.keySet).values.sum -
+          Some(partitionLatestOffsets.view.filterKeys(activePartitionsOffsets.keySet).values.sum -
               activePartitionsOffsets.values.sum)
       } else None
     }

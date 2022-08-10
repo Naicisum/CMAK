@@ -248,7 +248,7 @@ class Cluster (val cc: ControllerComponents, val kafkaManagerContext: KafkaManag
 
   def handleAddCluster = Action.async { implicit request: Request[AnyContent] =>
     featureGate(KMClusterManagerFeature) {
-      clusterConfigForm.bindFromRequest.fold(
+      clusterConfigForm.bindFromRequest().fold(
         formWithErrors => Future.successful(BadRequest(views.html.cluster.addCluster(formWithErrors))),
         clusterConfig => {
           kafkaManager.addCluster(clusterConfig.name,
@@ -284,7 +284,7 @@ class Cluster (val cc: ControllerComponents, val kafkaManagerContext: KafkaManag
 
   def handleUpdateCluster(c: String) = Action.async { implicit request: Request[AnyContent] =>
     featureGate(KMClusterManagerFeature) {
-      updateForm.bindFromRequest.fold(
+      updateForm.bindFromRequest().fold(
         formWithErrors => Future.successful(BadRequest(views.html.cluster.updateCluster(c, \/-(formWithErrors)))),
         clusterOperation => clusterOperation.op match {
           case Enable =>

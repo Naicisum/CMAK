@@ -42,7 +42,6 @@ import java.util
 import java.util.Properties
 import java.util.concurrent.{ConcurrentLinkedDeque, TimeUnit}
 import scala.collection.concurrent.TrieMap
-import scala.collection.immutable.Map
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
@@ -52,7 +51,7 @@ import scala.util.{Failure, Success, Try}
   */
 import kafka.manager.utils._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class NoopJMXReporter extends MetricsReporter {
   override def init(metrics: util.List[KafkaMetric]): Unit = {}
@@ -181,7 +180,7 @@ class KafkaAdminClient(context: => ActorContext, adminClientActorPath: ActorPath
 
 
 object KafkaManagedOffsetCache {
-  val supportedVersions: Set[KafkaVersion] = Set(Kafka_0_8_2_0, Kafka_0_8_2_1, Kafka_0_8_2_2, Kafka_0_9_0_0, Kafka_0_9_0_1, Kafka_0_10_0_0, Kafka_0_10_0_1, Kafka_0_10_1_0, Kafka_0_10_1_1, Kafka_0_10_2_0, Kafka_0_10_2_1, Kafka_0_11_0_0, Kafka_0_11_0_2, Kafka_1_0_0, Kafka_1_0_1, Kafka_1_1_0, Kafka_1_1_1, Kafka_2_0_0, Kafka_2_1_0, Kafka_2_1_1, Kafka_2_2_0, Kafka_2_2_1, Kafka_2_2_2, Kafka_2_3_0, Kafka_2_2_1, Kafka_2_4_0, Kafka_2_4_1, Kafka_2_5_0, Kafka_2_5_1, Kafka_2_6_0, Kafka_2_7_0, Kafka_2_8_0, Kafka_2_8_1, Kafka_3_0_0, Kafka_3_1_0)
+  val supportedVersions: Set[KafkaVersion] = Set(Kafka_0_8_2_0, Kafka_0_8_2_1, Kafka_0_8_2_2, Kafka_0_9_0_0, Kafka_0_9_0_1, Kafka_0_10_0_0, Kafka_0_10_0_1, Kafka_0_10_1_0, Kafka_0_10_1_1, Kafka_0_10_2_0, Kafka_0_10_2_1, Kafka_0_11_0_0, Kafka_0_11_0_2, Kafka_1_0_0, Kafka_1_0_1, Kafka_1_1_0, Kafka_1_1_1, Kafka_2_0_0, Kafka_2_1_0, Kafka_2_1_1, Kafka_2_2_0, Kafka_2_2_1, Kafka_2_2_2, Kafka_2_3_0, Kafka_2_2_1, Kafka_2_4_0, Kafka_2_4_1, Kafka_2_5_0, Kafka_2_5_1, Kafka_2_6_0, Kafka_2_7_0, Kafka_2_8_0, Kafka_2_8_1, Kafka_3_0_0, Kafka_3_1_0, Kafka_3_2_0, Kafka_3_2_1)
   val ConsumerOffsetTopic = "__consumer_offsets"
 
   def isSupported(version: KafkaVersion) : Boolean = {
@@ -189,7 +188,7 @@ object KafkaManagedOffsetCache {
   }
 
   def createSet[T](): mutable.Set[T] = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     java.util.Collections.newSetFromMap(
       new java.util.concurrent.ConcurrentHashMap[T, java.lang.Boolean]).asScala
   }
@@ -921,7 +920,7 @@ case class OffsetCachePassive(curator: CuratorFramework
 
   protected def getConsumerTopicsFromIds(consumer: String) : Set[String] = {
     val zkPath = "%s/%s/%s".format(ZkUtils.ConsumersPath,consumer,"ids")
-    val ids = Try(Option(curator.getChildren.forPath(zkPath)).map(_.asScala.toIterable)).toOption.flatten.getOrElse(Iterable.empty)
+    val ids = Try(Option(curator.getChildren.forPath(zkPath)).map(_.asScala)).toOption.flatten.getOrElse(Iterable.empty)
     val topicList : Iterable[Iterable[String]] = for {
       id <- ids
       idPath = "%s/%s".format(zkPath, id)
@@ -1128,7 +1127,7 @@ class KafkaStateActor(config: KafkaStateActorConfig) extends BaseClusterQueryCom
   }
 
   @scala.throws[Exception](classOf[Exception])
-  override def preRestart(reason: Throwable, message: Option[Any]) {
+  override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
     log.error(reason, "Restarting due to [{}] when processing [{}]",
       reason.getMessage, message.getOrElse(""))
     super.preRestart(reason, message)
@@ -1252,7 +1251,7 @@ class KafkaStateActor(config: KafkaStateActorConfig) extends BaseClusterQueryCom
     val result: Future[T] = Future {
       fn
     }
-    result pipeTo sender
+    result pipeTo sender()
   }
 
   override def processQueryRequest(request: QueryRequest): Unit = {
@@ -1270,9 +1269,9 @@ class KafkaStateActor(config: KafkaStateActorConfig) extends BaseClusterQueryCom
         withTopicsTreeCache { cache =>
           cache.getCurrentChildren(ZkUtils.BrokerTopicsPath)
         }.fold {
-          sender ! TopicList(IndexedSeq.empty, deleteSet, config.clusterContext)
+          sender() ! TopicList(IndexedSeq.empty, deleteSet, config.clusterContext)
         } { data: java.util.Map[String, ChildData] =>
-          sender ! TopicList(data.asScala.keySet.toIndexedSeq, deleteSet, config.clusterContext)
+          sender() ! TopicList(data.asScala.keySet.toIndexedSeq, deleteSet, config.clusterContext)
         }
 
       case KSGetConsumers =>
@@ -1281,13 +1280,13 @@ class KafkaStateActor(config: KafkaStateActorConfig) extends BaseClusterQueryCom
         }
 
       case KSGetTopicConfig(topic) =>
-        sender ! TopicConfig(topic, getTopicConfigString(topic))
+        sender() ! TopicConfig(topic, getTopicConfigString(topic))
 
       case KSGetTopicDescription(topic) =>
-        sender ! getTopicDescription(topic, false)
+        sender() ! getTopicDescription(topic, false)
 
       case KSGetTopicDescriptions(topics) =>
-        sender ! TopicDescriptions(topics.toIndexedSeq.flatMap(getTopicDescription(_, false)), topicsTreeCacheLastUpdateMillis)
+        sender() ! TopicDescriptions(topics.toIndexedSeq.flatMap(getTopicDescription(_, false)), topicsTreeCacheLastUpdateMillis)
 
       case KSGetConsumerDescription(consumer, consumerType) =>
         asyncPipeToSender {
@@ -1307,9 +1306,9 @@ class KafkaStateActor(config: KafkaStateActorConfig) extends BaseClusterQueryCom
           withTopicsTreeCache {  cache: TreeCache =>
             cache.getCurrentChildren(ZkUtils.BrokerTopicsPath)
           }.fold {
-            sender ! TopicDescriptions(IndexedSeq.empty, topicsTreeCacheLastUpdateMillis)
+            sender() ! TopicDescriptions(IndexedSeq.empty, topicsTreeCacheLastUpdateMillis)
           } { data: java.util.Map[String, ChildData] =>
-            sender ! TopicDescriptions(data.asScala.keys.toIndexedSeq.flatMap(getTopicDescription(_, false)), topicsTreeCacheLastUpdateMillis)
+            sender() ! TopicDescriptions(data.asScala.keys.toIndexedSeq.flatMap(getTopicDescription(_, false)), topicsTreeCacheLastUpdateMillis)
           }
         } // else no updates to send
 
@@ -1325,16 +1324,16 @@ class KafkaStateActor(config: KafkaStateActorConfig) extends BaseClusterQueryCom
         }
 
       case KSGetTopicsLastUpdateMillis =>
-        sender ! topicsTreeCacheLastUpdateMillis
+        sender() ! topicsTreeCacheLastUpdateMillis
 
       case KSGetBrokers =>
-        sender ! getBrokerList
+        sender() ! getBrokerList
 
       case KSGetPreferredLeaderElection =>
-        sender ! preferredLeaderElection
+        sender() ! preferredLeaderElection
 
       case KSGetReassignPartition =>
-        sender ! reassignPartitions
+        sender() ! reassignPartitions
 
       case any: Any => log.warning("ksa : processQueryRequest : Received unknown message: {}", any.toString)
     }

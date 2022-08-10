@@ -51,7 +51,7 @@ class PreferredReplicaElection (val cc: ControllerComponents, val kafkaManagerCo
 
   def handleRunElection(c: String) = Action.async { implicit request: Request[AnyContent] =>
     featureGate(KMPreferredReplicaElectionFeature) {
-      preferredReplicaElectionForm.bindFromRequest.fold(
+      preferredReplicaElectionForm.bindFromRequest().fold(
         formWithErrors => Future.successful(BadRequest(views.html.preferredReplicaElection(c, -\/(ApiError("Unknown operation!")), formWithErrors))),
         op => op match {
           case RunElection =>

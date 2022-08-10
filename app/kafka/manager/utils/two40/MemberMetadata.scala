@@ -19,7 +19,7 @@ package kafka.manager.utils.two40
 import org.apache.kafka.clients.admin.{ConsumerGroupDescription, MemberDescription}
 
 object MemberMetadata {
-  import collection.JavaConverters._
+  import scala.jdk.CollectionConverters._
   def from(groupId: String, groupSummary: ConsumerGroupDescription, memberSummary: MemberDescription) : MemberMetadata = {
     val assignment = memberSummary.assignment().topicPartitions().asScala.map(tp => tp.topic() -> tp.partition()).toSet
     MemberMetadata(

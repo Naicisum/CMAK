@@ -4,12 +4,12 @@
  */
 package kafka.test
 
-import com.google.common.io.Files
+import java.nio.file.Files
 import kafka.server.{KafkaConfig, KafkaServer}
 import org.apache.curator.framework.CuratorFramework
 import org.apache.curator.test.InstanceSpec
 
-import java.io.File
+import java.nio.file.Path
 import java.util.Properties
 import scala.util.Try
 
@@ -68,16 +68,16 @@ class KafkaTestBroker(zookeeper: CuratorFramework, zookeeperConnectionString: St
   }
 
   private def getLogDir: String = {
-    val logDir: File = Files.createTempDir
-    logDir.deleteOnExit()
-    logDir.getAbsolutePath
+    val logDir: Path = Files.createTempDirectory(null)
+    logDir.toFile.deleteOnExit()
+    logDir.toAbsolutePath.toString
   }
 
   def getBrokerConnectionString: String = s"localhost:$port"
 
   def getPort: Int = port
 
-  def shutdown() {
+  def shutdown(): Unit = {
     Try(kafkaServer.shutdown())
   }
 }

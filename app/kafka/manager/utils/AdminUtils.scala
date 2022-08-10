@@ -110,7 +110,7 @@ class AdminUtils(version: KafkaVersion) extends Logging {
                                                      partitionReplicaAssignment: Map[Int, Seq[Int]],
                                                      config: Properties = new Properties,
                                                      update: Boolean = false, 
-                                                     readVersion: Int = -1) {
+                                                     readVersion: Int = -1): Unit = {
     // validate arguments
     Topic.validate(topic)
     TopicConfigs.validate(version,config)
@@ -136,9 +136,9 @@ class AdminUtils(version: KafkaVersion) extends Logging {
   /**
    * Write out the topic config to zk, if there is any
    */
-  private def writeTopicConfig(curator: CuratorFramework, topic: String, config: Properties, readVersion: Int = -1) {
+  private def writeTopicConfig(curator: CuratorFramework, topic: String, config: Properties, readVersion: Int = -1): Unit = {
     val configMap: mutable.Map[String, String] = {
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       config.asScala
     }
     val map : Map[String, Any] = Map("version" -> 1, "config" -> configMap)
@@ -149,7 +149,7 @@ class AdminUtils(version: KafkaVersion) extends Logging {
                                             topic: String, 
                                             replicaAssignment: Map[Int, Seq[Int]], 
                                             update: Boolean, 
-                                            readVersion: Int = -1) {
+                                            readVersion: Int = -1): Unit = {
     try {
       val zkPath = ZkUtils.getTopicPath(topic)
       val jsonPartitionData = ZkUtils.replicaAssignmentZkData(replicaAssignment.map(e => (e._1.toString -> e._2)))
@@ -182,7 +182,7 @@ class AdminUtils(version: KafkaVersion) extends Logging {
                     newNumPartitions: Int,
                     partitionReplicaList : Map[Int, Seq[Int]],
                     brokerList: Set[Int],
-                    readVersion: Int) {
+                    readVersion: Int): Unit = {
     
     /*
     import collection.JavaConverters._
@@ -233,7 +233,7 @@ class AdminUtils(version: KafkaVersion) extends Logging {
                             topicAndReplicaList: Seq[(String, Map[Int, Seq[Int]])],
                             newNumPartitions: Int,
                             brokerList: Set[Int],
-                            readVersions: Map[String,Int]) {
+                            readVersions: Map[String,Int]): Unit = {
     val topicsWithoutReadVersion = topicAndReplicaList.map(x=>x._1).filter{t => !readVersions.contains(t)}
     checkCondition(topicsWithoutReadVersion.isEmpty, TopicErrors.NoReadVersionFound(topicsWithoutReadVersion.mkString(", ")))
 
@@ -254,7 +254,7 @@ class AdminUtils(version: KafkaVersion) extends Logging {
    *                 existing configs need to be deleted, it should be done prior to invoking this API
    *
    */
-  def changeTopicConfig(curator: CuratorFramework, topic: String, config: Properties, readVersion: Int) {
+  def changeTopicConfig(curator: CuratorFramework, topic: String, config: Properties, readVersion: Int): Unit = {
     checkCondition(topicExists(curator, topic),TopicErrors.TopicDoesNotExist(topic))
 
     // remove the topic overrides

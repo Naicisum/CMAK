@@ -57,7 +57,7 @@ object ApplicationFeatures extends Logging {
     KMReassignPartitionsFeature).map(_.getClass.getSimpleName)
   
   def getApplicationFeatures(config: Config) : ApplicationFeatures = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     val configFeatures: Option[List[String]] = Try(config.getStringList("application.features").asScala.toList).toOption
     
     if(configFeatures.isEmpty) {

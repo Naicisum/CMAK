@@ -122,7 +122,7 @@ class TestCreateTopic extends CuratorAwareTest with BaseTest {
         val configJson : String = curator.getData.forPath(ZkUtils.getTopicConfigPath("mytopic"))
         val td = TopicIdentity.from(3,TopicDescription("mytopic",(stat.getVersion,json),None,PartitionOffsetsCapture.EMPTY,Option((-1,configJson))),None,None,defaultClusterContext,None)
         val numPartitions = td.partitions
-        adminUtils.addPartitions(curator, td.topic, numPartitions, td.partitionsIdentity.mapValues(_.replicas.toSeq),brokerList, stat.getVersion)
+        adminUtils.addPartitions(curator, td.topic, numPartitions, td.partitionsIdentity.view.mapValues(_.replicas.toSeq).toMap,brokerList, stat.getVersion)
       }
     }
   }
@@ -136,7 +136,7 @@ class TestCreateTopic extends CuratorAwareTest with BaseTest {
         val configJson : String = curator.getData.forPath(ZkUtils.getTopicConfigPath("mytopic"))
         val td = TopicIdentity.from(3,TopicDescription("mytopic",(stat.getVersion,json),None,PartitionOffsetsCapture.EMPTY,Option((-1,configJson))),None,None,defaultClusterContext,None)
         val numPartitions = td.partitions + 2
-        adminUtils.addPartitions(curator, td.topic, numPartitions, td.partitionsIdentity.mapValues(_.replicas.toSeq),brokerList,stat.getVersion)
+        adminUtils.addPartitions(curator, td.topic, numPartitions, td.partitionsIdentity.view.mapValues(_.replicas.toSeq).toMap,brokerList,stat.getVersion)
       }
     }
   }
@@ -149,7 +149,7 @@ class TestCreateTopic extends CuratorAwareTest with BaseTest {
       val configJson : String = curator.getData.forPath(ZkUtils.getTopicConfigPath("mytopic"))
       val td = TopicIdentity.from(3,TopicDescription("mytopic",(stat.getVersion,json),None,PartitionOffsetsCapture.EMPTY,Option((-1,configJson))),None,None,defaultClusterContext,None)
       val numPartitions = td.partitions + 2
-      adminUtils.addPartitions(curator, td.topic, numPartitions, td.partitionsIdentity.mapValues(_.replicas.toSeq),brokerList,stat.getVersion)
+      adminUtils.addPartitions(curator, td.topic, numPartitions, td.partitionsIdentity.view.mapValues(_.replicas.toSeq).toMap,brokerList,stat.getVersion)
 
       //check partitions were added and config updated
       {
@@ -188,7 +188,7 @@ class TestCreateTopic extends CuratorAwareTest with BaseTest {
 
       //check config change notification
       {
-        import scala.collection.JavaConverters._
+        import scala.jdk.CollectionConverters._
 
         val json: Option[String] = Option(curator.getChildren.forPath(ZkUtils.TopicConfigChangesPath)).map { children =>
           val last = children.asScala.last

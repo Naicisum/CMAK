@@ -72,7 +72,7 @@ class LogkafkaViewCacheActor(config: LogkafkaViewCacheActorConfig) extends LongR
         context.actorSelection(config.logkafkaStateActorPath).tell(LKSGetAllLogkafkaClients(lastLogkafkaClientsUpdateMillisOption), self)
 
       case LKVGetLogkafkaIdentities =>
-        sender ! logkafkaIdentities
+        sender() ! logkafkaIdentities
         
       case any: Any => log.warning("bvca : processActorRequest : Received unknown message: {}", any)
     }

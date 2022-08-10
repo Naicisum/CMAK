@@ -67,7 +67,7 @@ class LogkafkaAdminUtils(version: KafkaVersion) extends Logging {
                                            update: Boolean = false,
                                            readVersion: Int = -1,
                                            checkConfig: Boolean = true 
-                                           ) {
+                                           ): Unit = {
     // validate arguments
     Logkafka.validateLogkafkaId(logkafka_id)
     Logkafka.validatePath(log_path)
@@ -77,7 +77,7 @@ class LogkafkaAdminUtils(version: KafkaVersion) extends Logging {
     }
 
     val configMap: mutable.Map[String, String] = {
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       config.asScala
     }
     val newConfigMap = Map(log_path -> Map(configMap.toSeq:_*))
@@ -94,7 +94,7 @@ class LogkafkaAdminUtils(version: KafkaVersion) extends Logging {
     } else {
       val merged = logkafkaConfigMap.toSeq ++ newConfigMap.toSeq
       val grouped = merged.groupBy(_._1)
-      val cleaned = grouped.mapValues(_.map(_._2).fold(Map.empty)(_ ++ _))
+      val cleaned = grouped.view.mapValues(_.map(_._2).fold(Map.empty)(_ ++ _)).toMap
       writeLogkafkaConfig(curator, logkafka_id, cleaned, readVersion)
     }
   }
@@ -121,7 +121,7 @@ class LogkafkaAdminUtils(version: KafkaVersion) extends Logging {
   /**
    * Write out the logkafka config to zk, if there is any
    */
-  private def writeLogkafkaConfig(curator: CuratorFramework, logkafka_id: String, configMap: Map[String, Map[String, String]], readVersion: Int = -1) {
+  private def writeLogkafkaConfig(curator: CuratorFramework, logkafka_id: String, configMap: Map[String, Map[String, String]], readVersion: Int = -1): Unit = {
     ZkUtils.updatePersistentPath(curator, LogkafkaZkUtils.getLogkafkaConfigPath(logkafka_id), toJson(configMap), readVersion)
   }
 }

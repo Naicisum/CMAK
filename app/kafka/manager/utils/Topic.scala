@@ -31,7 +31,7 @@ object Topic {
   val maxNameLength = 255
   private val rgx = new Regex(legalChars + "+")
 
-  def validate(topic: String) {
+  def validate(topic: String): Unit = {
     checkCondition(topic.length > 0, TopicNameEmpty)
     checkCondition(!(topic.equals(".") || topic.equals("..")), InvalidTopicName)
     checkCondition(topic.length <= maxNameLength, InvalidTopicLength)

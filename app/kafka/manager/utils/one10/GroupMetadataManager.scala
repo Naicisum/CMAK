@@ -34,7 +34,7 @@ import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.util.Optional
 import java.util.concurrent.locks.ReentrantLock
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.{Seq, immutable, mutable, _}
 
 private[one10] sealed trait GroupState
@@ -210,7 +210,7 @@ class GroupMetadata(val groupId: String, initialState: GroupState, time: Time) e
   def protocolOrNull: String = protocol.orNull
   def currentStateTimestampOrDefault: Long = currentStateTimestamp.getOrElse(-1)
 
-  def add(member: MemberMetadata, callback: JoinCallback = null) {
+  def add(member: MemberMetadata, callback: JoinCallback = null): Unit = {
     if (members.isEmpty)
       this.protocolType = Some(member.protocolType)
 
@@ -247,7 +247,7 @@ class GroupMetadata(val groupId: String, initialState: GroupState, time: Time) e
   }
 
   def onTxnOffsetCommitAppend(producerId: Long, topicPartition: TopicPartition,
-                              commitRecordMetadataAndOffset: CommitRecordMetadataAndOffset) {
+                              commitRecordMetadataAndOffset: CommitRecordMetadataAndOffset): Unit = {
     pendingTransactionalOffsetCommits.get(producerId) match {
       case Some(pendingOffset) =>
         if (pendingOffset.contains(topicPartition)
@@ -770,7 +770,7 @@ object GroupMetadataManager {
   // Formatter for use with tools such as console consumer: Consumer should also set exclude.internal.topics to false.
   // (specify --formatter "kafka.coordinator.group.GroupMetadataManager\$OffsetsMessageFormatter" when consuming __consumer_offsets)
   class OffsetsMessageFormatter extends MessageFormatter {
-    def writeTo(consumerRecord: ConsumerRecord[Array[Byte], Array[Byte]], output: PrintStream) {
+    def writeTo(consumerRecord: ConsumerRecord[Array[Byte], Array[Byte]], output: PrintStream): Unit = {
       Option(consumerRecord.key).map(key => GroupMetadataManager.readMessageKey(ByteBuffer.wrap(key))).foreach {
         // Only print if the message is an offset record.
         // We ignore the timestamp of the message because GroupMetadataMessage has its own timestamp.
@@ -791,7 +791,7 @@ object GroupMetadataManager {
 
   // Formatter for use with tools to read group metadata history
   class GroupMetadataMessageFormatter extends MessageFormatter {
-    def writeTo(consumerRecord: ConsumerRecord[Array[Byte], Array[Byte]], output: PrintStream) {
+    def writeTo(consumerRecord: ConsumerRecord[Array[Byte], Array[Byte]], output: PrintStream): Unit = {
       Option(consumerRecord.key).map(key => GroupMetadataManager.readMessageKey(ByteBuffer.wrap(key))).foreach {
         // Only print if the message is a group metadata record.
         // We ignore the timestamp of the message because GroupMetadataMessage has its own timestamp.

@@ -80,7 +80,7 @@ class DeleteClusterActor(config: DeleteClusterActorConfig) extends BaseCommandAc
   override def processCommandRequest(request: CommandRequest): Unit = {
     request match  {
       case DCUpdateState =>
-        import scala.collection.JavaConverters._
+        import scala.jdk.CollectionConverters._
         Option(deleteClustersPathCache.getCurrentData).foreach { list =>
           list.asScala.take(config.deletionBatchSize).foreach { cd =>
             val cn = nodeFromPath(cd.getPath)
@@ -120,7 +120,7 @@ class DeleteClusterActor(config: DeleteClusterActorConfig) extends BaseCommandAc
   }
 
   private[this] def cleanClusterPath(zkpath: String) : Unit = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     Option(config.curator.checkExists().forPath(zkpath)).foreach { stat =>
       //path exists, attempt to get children
       Option(config.curator.getChildren.forPath(zkpath)).foreach { children =>

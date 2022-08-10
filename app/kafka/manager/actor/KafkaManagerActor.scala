@@ -37,7 +37,7 @@ object KafkaManagerActor {
 
 import kafka.manager.model.ActorModel._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.duration._
 
 case class KafkaManagerActorConfig(curatorConfig: CuratorConfig
@@ -190,7 +190,7 @@ class KafkaManagerActor(kafkaManagerConfig: KafkaManagerActorConfig)
   }
 
   @scala.throws[Exception](classOf[Exception])
-  override def preRestart(reason: Throwable, message: Option[Any]) {
+  override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
     log.error(reason, "Restarting due to [{}] when processing [{}]",
       reason.getMessage, message.getOrElse(""))
     super.preRestart(reason, message)
@@ -226,16 +226,16 @@ class KafkaManagerActor(kafkaManagerConfig: KafkaManagerActorConfig)
   override def processQueryRequest(request: QueryRequest): Unit = {
     request match {
       case KMGetActiveClusters =>
-        sender ! KMQueryResult(clusterConfigMap.values.filter(_.enabled).toIndexedSeq)
+        sender() ! KMQueryResult(clusterConfigMap.values.filter(_.enabled).toIndexedSeq)
 
       case KMGetAllClusters =>
-        sender ! KMClusterList(clusterConfigMap.values.toIndexedSeq, pendingClusterConfigMap.values.toIndexedSeq)
+        sender() ! KMClusterList(clusterConfigMap.values.toIndexedSeq, pendingClusterConfigMap.values.toIndexedSeq)
 
       case KSGetScheduleLeaderElection =>
-        sender ! ZkUtils.readDataMaybeNull(curator, ZkUtils.SchedulePreferredLeaderElectionPath)._1.getOrElse("{}")
+        sender() ! ZkUtils.readDataMaybeNull(curator, ZkUtils.SchedulePreferredLeaderElectionPath)._1.getOrElse("{}")
 
       case KMGetClusterConfig(name) =>
-        sender ! KMClusterConfigResult(Try {
+        sender() ! KMClusterConfigResult(Try {
           val cc = clusterConfigMap.get(name)
           require(cc.isDefined, s"Unknown cluster : $name")
           cc.get
@@ -243,7 +243,7 @@ class KafkaManagerActor(kafkaManagerConfig: KafkaManagerActorConfig)
 
       case KMClusterQueryRequest(clusterName, request) =>
         clusterManagerMap.get(clusterName).fold[Unit] {
-          sender ! ActorErrorResponse(s"Unknown cluster : $clusterName")
+          sender() ! ActorErrorResponse(s"Unknown cluster : $clusterName")
         } {
           clusterManagerPath:ActorPath =>
             context.actorSelection(clusterManagerPath).forward(request)
@@ -356,7 +356,7 @@ class KafkaManagerActor(kafkaManagerConfig: KafkaManagerActorConfig)
 
       case KMClusterCommandRequest(clusterName, request) =>
         clusterManagerMap.get(clusterName).fold[Unit] {
-          sender ! ActorErrorResponse(s"Unknown cluster : $clusterName")
+          sender() ! ActorErrorResponse(s"Unknown cluster : $clusterName")
         } {
           clusterManagerPath:ActorPath =>
             context.actorSelection(clusterManagerPath).forward(request)

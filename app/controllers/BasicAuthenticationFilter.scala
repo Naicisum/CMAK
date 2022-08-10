@@ -18,7 +18,7 @@ import java.security.SecureRandom
 import java.util.UUID
 import javax.crypto.Mac
 import javax.net.ssl
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Try}
 

@@ -80,6 +80,8 @@ class Topic (val cc: ControllerComponents, val kafkaManagerContext: KafkaManager
   val kafka_2_8_1_Default = CreateTopic("",1,1,TopicConfigs.configNamesAndDoc(Kafka_2_8_1).map{ case (n, h) => TConfig(n,None,Option(h))}.toList)
   val kafka_3_0_0_Default = CreateTopic("",1,1,TopicConfigs.configNamesAndDoc(Kafka_3_0_0).map{ case (n, h) => TConfig(n,None,Option(h))}.toList)
   val kafka_3_1_0_Default = CreateTopic("",1,1,TopicConfigs.configNamesAndDoc(Kafka_3_1_0).map{ case (n, h) => TConfig(n,None,Option(h))}.toList)
+  val kafka_3_2_0_Default = CreateTopic("",1,1,TopicConfigs.configNamesAndDoc(Kafka_3_2_0).map{ case (n, h) => TConfig(n,None,Option(h))}.toList)
+  val kafka_3_2_1_Default = CreateTopic("",1,1,TopicConfigs.configNamesAndDoc(Kafka_3_2_1).map{ case (n, h) => TConfig(n,None,Option(h))}.toList)
 
   val defaultCreateForm = Form(
     mapping(
@@ -196,6 +198,8 @@ class Topic (val cc: ControllerComponents, val kafkaManagerContext: KafkaManager
           case Kafka_2_8_1 => (defaultCreateForm.fill(kafka_2_8_1_Default), clusterContext)
           case Kafka_3_0_0 => (defaultCreateForm.fill(kafka_3_0_0_Default), clusterContext)
           case Kafka_3_1_0 => (defaultCreateForm.fill(kafka_3_1_0_Default), clusterContext)
+          case Kafka_3_2_0 => (defaultCreateForm.fill(kafka_3_2_0_Default), clusterContext)
+          case Kafka_3_2_1 => (defaultCreateForm.fill(kafka_3_2_1_Default), clusterContext)
         }
       }
     }
@@ -230,7 +234,7 @@ class Topic (val cc: ControllerComponents, val kafkaManagerContext: KafkaManager
 
   def handleCreateTopic(clusterName: String) = Action.async { implicit request:Request[AnyContent] =>
     featureGate(KMTopicManagerFeature) {
-      defaultCreateForm.bindFromRequest.fold(
+      defaultCreateForm.bindFromRequest().fold(
         formWithErrors => {
           kafkaManager.getClusterContext(clusterName).map { clusterContext =>
             BadRequest(views.html.topic.createTopic(clusterName, clusterContext.map(c => (formWithErrors, c))))
@@ -277,7 +281,7 @@ class Topic (val cc: ControllerComponents, val kafkaManagerContext: KafkaManager
 
   def handleDeleteTopic(clusterName: String, topic: String) = Action.async { implicit request:Request[AnyContent] =>
     featureGate(KMTopicManagerFeature) {
-      defaultDeleteForm.bindFromRequest.fold(
+      defaultDeleteForm.bindFromRequest().fold(
         formWithErrors => Future.successful(
           BadRequest(views.html.topic.topicView(
             clusterName,
@@ -347,7 +351,7 @@ class Topic (val cc: ControllerComponents, val kafkaManagerContext: KafkaManager
 
   def handleAddPartitions(clusterName: String, topic: String) = Action.async { implicit request:Request[AnyContent] =>
     featureGate(KMTopicManagerFeature) {
-      defaultAddPartitionsForm.bindFromRequest.fold(
+      defaultAddPartitionsForm.bindFromRequest().fold(
         formWithErrors => {
           kafkaManager.getClusterContext(clusterName).map { clusterContext =>
             BadRequest(views.html.topic.addPartitions(clusterName, topic, clusterContext.map(c => (formWithErrors, c))))
@@ -383,7 +387,7 @@ class Topic (val cc: ControllerComponents, val kafkaManagerContext: KafkaManager
 
   def handleAddPartitionsToMultipleTopics(clusterName: String) = Action.async { implicit request:Request[AnyContent] =>
     featureGate(KMTopicManagerFeature) {
-      defaultAddMultipleTopicsPartitionsForm.bindFromRequest.fold(
+      defaultAddMultipleTopicsPartitionsForm.bindFromRequest().fold(
         formWithErrors => {
           kafkaManager.getClusterContext(clusterName).map { clusterContext =>
             BadRequest(views.html.topic.addPartitionsToMultipleTopics(clusterName, clusterContext.map(c => (formWithErrors, c))))
@@ -460,6 +464,8 @@ class Topic (val cc: ControllerComponents, val kafkaManagerContext: KafkaManager
           case Kafka_2_8_1 => TopicConfigs.configNamesAndDoc(Kafka_2_8_1).map { case (n, h) => (n,TConfig(n,None, Option(h))) }
           case Kafka_3_0_0 => TopicConfigs.configNamesAndDoc(Kafka_3_0_0).map { case (n, h) => (n,TConfig(n,None, Option(h))) }
           case Kafka_3_1_0 => TopicConfigs.configNamesAndDoc(Kafka_3_1_0).map { case (n, h) => (n,TConfig(n,None, Option(h))) }
+          case Kafka_3_2_0 => TopicConfigs.configNamesAndDoc(Kafka_3_2_0).map { case (n, h) => (n,TConfig(n,None, Option(h))) }
+          case Kafka_3_2_1 => TopicConfigs.configNamesAndDoc(Kafka_3_2_1).map { case (n, h) => (n,TConfig(n,None, Option(h))) }
         }
         val updatedConfigMap = ti.config.toMap
         val updatedConfigList = defaultConfigs.map {
@@ -491,7 +497,7 @@ class Topic (val cc: ControllerComponents, val kafkaManagerContext: KafkaManager
 
   def handleUpdateConfig(clusterName: String, topic: String) = Action.async { implicit request:Request[AnyContent] =>
     featureGate(KMTopicManagerFeature) {
-      defaultUpdateConfigForm.bindFromRequest.fold(
+      defaultUpdateConfigForm.bindFromRequest().fold(
         formWithErrors => {
           kafkaManager.getClusterContext(clusterName).map { clusterContext =>
             BadRequest(views.html.topic.updateConfig(clusterName, topic, clusterContext.map(c => (formWithErrors, c))))

@@ -34,7 +34,7 @@ import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.util.Optional
 import java.util.concurrent.locks.ReentrantLock
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.{Seq, immutable, mutable, _}
 
 private[two40] sealed trait GroupState
@@ -210,7 +210,7 @@ class GroupMetadata(val groupId: String, initialState: GroupState, time: Time) e
   def protocolOrNull: String = protocol.orNull
   def currentStateTimestampOrDefault: Long = currentStateTimestamp.getOrElse(-1)
 
-  def add(member: MemberMetadata, callback: JoinCallback = null) {
+  def add(member: MemberMetadata, callback: JoinCallback = null): Unit = {
     if (members.isEmpty)
       this.protocolType = Some(member.protocolType)
 
@@ -247,7 +247,7 @@ class GroupMetadata(val groupId: String, initialState: GroupState, time: Time) e
   }
 
   def onTxnOffsetCommitAppend(producerId: Long, topicPartition: TopicPartition,
-                              commitRecordMetadataAndOffset: CommitRecordMetadataAndOffset) {
+                              commitRecordMetadataAndOffset: CommitRecordMetadataAndOffset): Unit = {
     pendingTransactionalOffsetCommits.get(producerId) match {
       case Some(pendingOffset) =>
         if (pendingOffset.contains(topicPartition)

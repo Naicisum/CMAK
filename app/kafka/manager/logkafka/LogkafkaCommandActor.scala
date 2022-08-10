@@ -34,7 +34,7 @@ class LogkafkaCommandActor(logkafkaCommandActorConfig: LogkafkaCommandActorConfi
   }
 
   @scala.throws[Exception](classOf[Exception])
-  override def preRestart(reason: Throwable, message: Option[Any]) {
+  override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
     log.error(reason, "Restarting due to [{}] when processing [{}]",
       reason.getMessage, message.getOrElse(""))
     super.preRestart(reason, message)
@@ -48,7 +48,7 @@ class LogkafkaCommandActor(logkafkaCommandActorConfig: LogkafkaCommandActorConfi
   override protected def longRunningPoolConfig: LongRunningPoolConfig = logkafkaCommandActorConfig.longRunningPoolConfig
 
   override protected def longRunningQueueFull(): Unit = {
-    sender ! LKCCommandResult(Try(throw new UnsupportedOperationException("Long running executor blocking queue is full!")))
+    sender() ! LKCCommandResult(Try(throw new UnsupportedOperationException("Long running executor blocking queue is full!")))
   }
 
   override def processActorResponse(response: ActorResponse): Unit = {

@@ -78,7 +78,7 @@ case class LogConfig(props: java.util.Map[_, _]) extends AbstractConfig(LogConfi
 
 object LogConfig extends TopicConfigs {
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     System.out.println(configDef.toHtmlTable)
   }
 
@@ -164,7 +164,7 @@ object LogConfig extends TopicConfigs {
   def apply(): LogConfig = LogConfig(new Properties())
 
   val configNames : Seq[String] = {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     configDef.names.asScala.toSeq.sorted
   }
 
@@ -182,8 +182,8 @@ object LogConfig extends TopicConfigs {
   /**
     * Check that property names are valid
     */
-  def validateNames(props: Properties) {
-    import scala.collection.JavaConverters._
+  def validateNames(props: Properties): Unit = {
+    import scala.jdk.CollectionConverters._
     val names = configDef.names()
     for(name <- props.keys.asScala)
       require(names.contains(name), "Unknown configuration \"%s\".".format(name))
@@ -192,7 +192,7 @@ object LogConfig extends TopicConfigs {
   /**
     * Check that the given properties contain only valid log config names and that all values can be parsed and are valid
     */
-  def validate(props: Properties) {
+  def validate(props: Properties): Unit = {
     validateNames(props)
     configDef.parse(props)
   }
